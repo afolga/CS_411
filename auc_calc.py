@@ -35,7 +35,6 @@ for i in range(len(probability_array)):
     if len(probability_array)==len(positive_negative):
         my_dict[probability_array[i][1]]=positive_negative[i][1]
 res = {key: val for key, val in sorted(my_dict.items(), key = lambda ele: ele[0], reverse = True)} #this sorts the values by ascending order
-print(res)
 tn=0# of -- in the dataset originally
 fn=0#of ++ in the dataset originally
 for x,y in res.items(): #y is the key
@@ -60,50 +59,50 @@ for x,y in res.items():
     tpr[count] = tp / (tp + fn)
     fpr[count] = fp / (tn + fp)
     count+=1
-print(tpr, fpr)
+print(tpr)
+print(fpr)
 
-auc_add=[0]*len(tpr)
-auc=0
 
-for i in range(0,len(tpr)):
-    if tpr[i] ==0 or fpr[i]==0:
-        auc_add[i]=0
-    else:
-        auc_add[i] = tpr[i] / fpr[i]
-    auc+=auc_add[i]
+#auc=0
     #print("THIS IS AUC:"+str(auc))
 #when the height or width is changing, can calculate
-auc=1*np.trapz(tpr,fpr) #integrating, probs should ask
+#auc=1*np.trapz(tpr,fpr) #integrating, probs should ask
 #have to do it by sqaures
-print(auc)
+#print(auc)
 
 
-delta_x=0
-delta_y=0
+
 #consider sliding window technique
 delta_x = fpr[0]
 delta_y = tpr[0]
 area=0
 num_rectangles=0
 for i in range(len(tpr)):
-    if fpr[i]!=delta_x and tpr[i]!=delta_y:
-        print(str(fpr[i])+"--"+str(delta_x)+"*"+str(delta_y))
-        area+=(fpr[i]-delta_x)*delta_y
-        print("THIS IS THE AREA:"+str(area))
-        delta_x=fpr[i]
-        delta_y=tpr[i]
+    print("AREA : " + str(fpr[i]) + "--" + str(delta_x) + "*" + str(delta_y))
+    #first case, no idea how to fix because both need to be different
+    if delta_x!=fpr[i] and delta_y!=tpr[i]:
+        #delta_x=fpr[i]
+        #delta_y=tpr[i]
+        print("AREA : " + str(fpr[i]) + "--" + str(delta_x) + "*" + str(delta_y))
+        area += (fpr[i] - delta_x) * tpr[i]-delta_y
+        delta_x = fpr[i]
+
+        #delta_y=tpr[i]
+        print("delta_x: "+str(delta_x)+"delta_y:"+str(delta_y))
         num_rectangles+=1
-print(num_rectangles)
+area=area*-1
+print(area)
+
     #have to check for changes in x over y
 
 
 
 #THIS IS MY OWN CODE TO CHECK TO SEE IF IT MATCHES THE EXAMPLE!!!!!!!
-fig=px.line(x=fpr,y=tpr)
-fig.show()
+#fig=px.line(x=fpr,y=tpr)
+#fig.show()
 
 
 
 f=open("auc.txt","w")
-f.write(str(auc))
+f.write(str(area))
 f.close()
