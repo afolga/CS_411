@@ -91,20 +91,18 @@ def get_likelihood(data, nameList, smoothing): # data being the split dictionary
 # Rest of Program
 print('Python refresh sanity check')
 smoothingBool = False # pretty sure smoothing works
+
 trainingFileString = 'file3.txt'
-testingFileString = ''
-#demoTrainingFileOne = 'NB_probabilities_no_smoothing.txt'
-#demoTrainingFileTwo = 'NB_ probabilities_smoothing.txt'
-#demoTestFile = 'NB_test_smoothing.txt'
-outputTestClassFile = '' # create new file, which will be written to
+testingFileString = 'file4.txt'
+
 parsedData = [] # list of list (parsed strings)
 attrNameArray = [] # list of attr names + class name at index[-1]
 numPerAttrPerClassArray = [] # total num insatnces per atttribute per class
 totalInstances = 0
 
 # // getting data from training file as list of list
-with open(trainingFileString) as file3:
-        fileInput = file3.readlines() # grabbed file data as list of strings
+with open(trainingFileString) as trainingFile:
+        fileInput = trainingFile.readlines() # grabbed file data as list of strings
         # // split fileInput LoS into List of List
         i = 1
         for line in fileInput:
@@ -121,6 +119,12 @@ with open(trainingFileString) as file3:
                                 totalInstances = totalInstances + 1
 
 split_input = split_by_class(parsedData) # btw dictionary
+
+# training output files
+outputTrainFile = 'privateTrainOutput.txt'
+demoTrainingFileOne = 'NB_probabilities_no_smoothing.txt'
+demoTrainingFileTwo = 'NB_ probabilities_smoothing.txt'
+f=open(outputTrainFile,"w")
 
 # getting all likelihoods
 # class likelihoods
@@ -139,7 +143,7 @@ for classKey in instanceLikelihood:
 
 for key in classProbs:
         probability = float(key.count) / totalInstances
-        print("P(" + attrNameArray[-1] + "=" + key.data + ") = " + str(probability)) # P(C=?) = ?
+        f.write("P(" + attrNameArray[-1] + "=" + key.data + ") = " + str(probability) + "\n") # P(C=?) = ?
 classIndex = 0
 for classKey in instanceLikelihood:
         #print(classKey)
@@ -149,13 +153,20 @@ for classKey in instanceLikelihood:
                 for data in instance:
                         #print(data)
                         prob = data[1] / float(numPerAttrPerClassArray[classIndex][1])
-                        print("P(" + attrNameArray[index] + "=" + data[0] + " | " + attrNameArray[-1] + "=" + classKey + ") = " + str(prob)) # P(AttrName=? | C=?) = ?
+                        f.write("P(" + attrNameArray[index] + "=" + data[0] + " | " + attrNameArray[-1] + "=" + classKey + ") = " + str(prob) + "\n") # P(AttrName=? | C=?) = ?
                 index = index + 1
         classIndex = classIndex + 1
 
+# create and populate data structure to hold probs for testing
+
+f.close()
+
 # for test data (not training data)
-with open(trainingFileString) as file3:
-        fileInput = file3.readlines() # grabbed file data as list of strings
+testAttrNameArray = [] # HOLD TEST ATTR NAMES
+parsedData = [] # reusing old list from training
+
+with open(testingFileString) as testFile:
+        fileInput = testFile.readlines() # grabbed file data as string
         # // split fileInput LoS into List of List
         i = 1
         for line in fileInput:
@@ -163,16 +174,31 @@ with open(trainingFileString) as file3:
                 if line:
                         if i==1: # don't add attr names to list of list i.e. data instances
                                 i = i+1
-                                attrNameArray = [attribute.strip() for attribute in line.split(',')] # make list from string
+                                testAttrNameArray = [attribute.strip() for attribute in line.split(',')] # make list from string
                         else:
                                 parsedLine = []
                                 #data = line.split(',')
                                 data = [attribute.strip() for attribute in line.split(',')] # make list from string
                                 parsedData.append(data)  # populate list of list
-                                totalInstances = totalInstances + 1
 
-# output goes here
+testProbList = []
+classIndex = 0
+for classKey in instanceLikelihood:
+        index = 0
+        for instance in instanceLikelihood[classKey]:
+                for data in instance:
+                        prob = data[1] / float(numPerAttrPerClassArray[classIndex][1])
+                        # f.write("P(" + attrNameArray[index] + "=" + data[0] + " | " + attrNameArray[-1] + "=" + classKey + ") = " + str(prob) + "\n") # P(AttrName=? | C=?) = ?
+                index = index + 1
+        classIndex = classIndex + 1
 
+
+# testing output
+demoTestFile = 'NB_test_smoothing.txt'
+outputTestFile = 'privateTestsOutput.txt'
+# f=open(outputTestFile,"w")
+# f.write("tuff")
+# f.close()
 
 # NOTES
 # for smoothing: use function on slides (w/ Additoinal Issues--zero counts)
