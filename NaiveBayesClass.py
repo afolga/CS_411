@@ -181,15 +181,27 @@ with open(testingFileString) as testFile:
                                 data = [attribute.strip() for attribute in line.split(',')] # make list from string
                                 parsedData.append(data)  # populate list of list
 
+print(parsedData)
 testProbList = []
 classIndex = 0
 for classKey in instanceLikelihood:
-        index = 0
+        print("class: " + classKey)
         for instance in instanceLikelihood[classKey]:
-                for data in instance:
-                        prob = data[1] / float(numPerAttrPerClassArray[classIndex][1])
-                        # f.write("P(" + attrNameArray[index] + "=" + data[0] + " | " + attrNameArray[-1] + "=" + classKey + ") = " + str(prob) + "\n") # P(AttrName=? | C=?) = ?
-                index = index + 1
+                #print(instance)
+                for i in range(len(parsedData)):
+                        prob = 0
+                        if (instance[i-1][0] in parsedData[i]):
+                                if smoothingBool == False:
+                                        prob = instance[i-1][1] / float(numPerAttrPerClassArray[classIndex][1])
+                                        # testProbList.append()
+                                        print(instance[i-1][0])
+                                else:
+                                        print()
+                        else:
+                                if smoothingBool == False:
+                                        print()
+                                else:
+                                        print()
         classIndex = classIndex + 1
 
 
