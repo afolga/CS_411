@@ -61,30 +61,26 @@ def get_likelihood(data, nameList, smoothing): # data being the split dictionary
                         for i in range(len(instance) - 1):
                                 # populating the inside-most list w/ count
                                 # uncomment print statements in conditionals for error checking (3 total) + 1 at bottom for full set (line 79)
-                                if (len(like_set[key][i]) == 0): # first instance
-                                        #print("added " + instance[valCounter])
+                                if (len(like_set[key][i]) == 0): # first instance of charAttr group
                                         if smoothing == False:
                                                 like_set[key][i].append([instance[valCounter], 1])
                                         else:
                                                 like_set[key][i].append([instance[valCounter], 2])
-                                elif instance[valCounter] not in like_set[key][i][0]: # ----------------- can't figure out how to loop thru entire 2nd array[i] inside if
-                                        #print("added " + instance[valCounter])
-                                        if smoothing == False:
-                                                like_set[key][i].append([instance[valCounter], 1])
-                                        else:
-                                                like_set[key][i].append([instance[valCounter], 2])
-                                else: # duplicate
-                                        #print("dub = " + str(like_set[key][i][0]))
-                                        like_set[key][i][0][1] = like_set[key][i][0][1] + 1
+                                else:
+                                        dupBoolean = False
+                                        for j in range(len(like_set[key][i])):
+                                                if instance[valCounter] == like_set[key][i][j][0]:
+                                                        #print("instrance[valCounter] is " + instance[valCounter] + " and " + str(like_set[key][i][j][0]))
+                                                        dupBoolean = True
+                                                        break
+                                        if dupBoolean == True: # duplicate found
+                                                like_set[key][i][j][1] = like_set[key][i][j][1] + 1
+                                        else: # no duplicate
+                                                if smoothing == False:
+                                                        like_set[key][i].append([instance[valCounter], 1])
+                                                else:
+                                                        like_set[key][i].append([instance[valCounter], 2])
                                 valCounter = valCounter + 1
-
-                                # # populating inside-most list w/o count
-                                # if (instance[valCounter] not in like_set[key][i]):
-                                #        like_set[key][i].append(instance[valCounter])
-                                # else:
-                                #         # print("dub")
-                                #         print("")
-                                # valCounter = valCounter + 1
         #print(like_set)
         return like_set
 
@@ -145,6 +141,8 @@ for key in classProbs:
         probability = float(key.count) / totalInstances
         f.write("P(" + attrNameArray[-1] + "=" + key.data + ") = " + str(probability) + "\n") # P(C=?) = ?
 classIndex = 0
+
+condProbDict = dict() # conditional probability dictionary
 for classKey in instanceLikelihood:
         #print(classKey)
         index = 0
@@ -153,7 +151,9 @@ for classKey in instanceLikelihood:
                 for data in instance:
                         #print(data)
                         prob = data[1] / float(numPerAttrPerClassArray[classIndex][1])
-                        f.write("P(" + attrNameArray[index] + "=" + data[0] + " | " + attrNameArray[-1] + "=" + classKey + ") = " + str(prob) + "\n") # P(AttrName=? | C=?) = ?
+                        term = str(attrNameArray[index] + "=" + data[0] + " | " + attrNameArray[-1] + "=" + classKey)
+                        condProbDict[term] = prob
+                        f.write("P(" + term + ") = " + str(prob) + "\n") # P(AttrName=? | C=?) = ?
                 index = index + 1
         classIndex = classIndex + 1
 
@@ -190,20 +190,23 @@ for classKey in instanceLikelihood:
                 #print(instance)
                 for i in range(len(parsedData)):
                         prob = 0
-                        if (instance[i-1][0] in parsedData[i]):
-                                if smoothingBool == False:
-                                        prob = instance[i-1][1] / float(numPerAttrPerClassArray[classIndex][1])
-                                        # testProbList.append()
-                                        print(instance[i-1][0])
-                                else:
-                                        print()
-                        else:
-                                if smoothingBool == False:
-                                        print()
-                                else:
-                                        print()
+                        # if (instance[i-1][0] in parsedData[i]):
+                        #         if smoothingBool == False:
+                        #                 prob = instance[i-1][1] / float(numPerAttrPerClassArray[classIndex][1])
+                        #                 # testProbList.append()
+                        #                 print(instance[i-1][0])
+                        #         else:
+                        #                 print()
+                        # else:
+                        #         if smoothingBool == False:
+                        #                 print()
+                        #         else:
+                        #                 print()
         classIndex = classIndex + 1
 
+for key in condProbDict:
+        continue
+        #print("Key: " + key + " has val of " + str(condProbDict[key]))
 
 # testing output
 demoTestFile = 'NB_test_smoothing.txt'
