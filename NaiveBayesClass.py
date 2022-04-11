@@ -16,7 +16,7 @@ x, y, f, d, 0
 x, s, f, r, 0
 
 '''
-#from anytree import Node, RenderTree // wanted to use this library for its tree implementation
+# for demo, alter code on lines 91,93,94,125,225 (file names, smoothin vars)
 
 
 
@@ -88,10 +88,10 @@ def get_likelihood(data, nameList, smoothing): # data being the split dictionary
 
 # Rest of Program
 #print('Python refresh sanity check')
-smoothingBool = True # pretty sure smoothing works
+smoothingBool = True #--change during demo
 
-trainingFileString = 'file3.txt'
-testingFileString = 'file4.txt'
+trainingFileString = 'file3.txt' #--change during demo
+testingFileString = 'file4.txt' #--change during demo
 
 parsedData = [] # list of list (parsed strings)
 attrNameArray = [] # list of attr names + class name at index[-1]
@@ -122,7 +122,7 @@ split_input = split_by_class(parsedData) # btw dictionary
 outputTrainFile = 'privateTrainOutput.txt'
 demoTrainingFileOne = 'NB_probabilities_no_smoothing.txt'
 demoTrainingFileTwo = 'NB_ probabilities_smoothing.txt'
-f=open(outputTrainFile,"w")
+f=open(outputTrainFile,"w") #--change during demo
 
 # getting all likelihoods
 # class likelihoods
@@ -222,7 +222,7 @@ for classKey in instanceLikelihood:
 # testing output
 demoTestFile = 'NB_test_smoothing.txt'
 outputTestFile = 'privateTestsOutput.txt'
-testFileOut=open(outputTestFile,"w")
+testFileOut=open(outputTestFile,"w") #--change during demo
 for testedInstances in testProbList: # row in test file
         bestProb = testedInstances[0]
         savedBestIndex = 0
