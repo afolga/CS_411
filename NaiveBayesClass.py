@@ -18,6 +18,8 @@ x, s, f, r, 0
 '''
 #from anytree import Node, RenderTree // wanted to use this library for its tree implementation
 
+
+
 class dataNode: # e.g. node for storing data to get likelihoods
         def __init__(self, data, count):
                 self.data = data
@@ -85,8 +87,8 @@ def get_likelihood(data, nameList, smoothing): # data being the split dictionary
         return like_set
 
 # Rest of Program
-print('Python refresh sanity check')
-smoothingBool = False # pretty sure smoothing works
+#print('Python refresh sanity check')
+smoothingBool = True # pretty sure smoothing works
 
 trainingFileString = 'file3.txt'
 testingFileString = 'file4.txt'
@@ -171,49 +173,75 @@ with open(testingFileString) as testFile:
         i = 1
         for line in fileInput:
                 line = line.strip()
-                if line:
-                        if i==1: # don't add attr names to list of list i.e. data instances
-                                i = i+1
-                                testAttrNameArray = [attribute.strip() for attribute in line.split(',')] # make list from string
-                        else:
-                                parsedLine = []
-                                #data = line.split(',')
-                                data = [attribute.strip() for attribute in line.split(',')] # make list from string
-                                parsedData.append(data)  # populate list of list
+                if line: # not stripping attr names
+                        parsedLine = []
+                        #data = line.split(',')
+                        data = [attribute.strip() for attribute in line.split(',')] # make list from string
+                        parsedData.append(data)  # populate list of list
 
-print(parsedData)
+#print(parsedData)
 testProbList = []
 classIndex = 0
+# use condProbDict for testing/getting class probabilities
+#print(totalInstances)
 for classKey in instanceLikelihood:
-        print("class: " + classKey)
-        for instance in instanceLikelihood[classKey]:
-                #print(instance)
-                for i in range(len(parsedData)):
-                        prob = 0
-                        # if (instance[i-1][0] in parsedData[i]):
-                        #         if smoothingBool == False:
-                        #                 prob = instance[i-1][1] / float(numPerAttrPerClassArray[classIndex][1])
-                        #                 # testProbList.append()
-                        #                 print(instance[i-1][0])
-                        #         else:
-                        #                 print()
-                        # else:
-                        #         if smoothingBool == False:
-                        #                 print()
-                        #         else:
-                        #                 print()
-        classIndex = classIndex + 1
-
-for key in condProbDict:
-        continue
-        #print("Key: " + key + " has val of " + str(condProbDict[key]))
+        classProbList = []
+        for testListIndex in range(len(parsedData)-1):
+                #print(parsedData[testListIndex+1]) # conditional prob equations
+                attrCounter = 0
+                totalProb = 1
+                for dataTestInstance in parsedData[testListIndex+1]: #checking each instance
+                        #print(dataTestInstance)
+                        foundMatchingProb = False # boolean for match
+                        foundProb = 0.0 # float for holding prob
+                        for key in condProbDict: # checking probability dictionary
+                                #print("Key: " + key + " has val of " + str(condProbDict[key]))
+                                #print(key)
+                                searchString = str(parsedData[0][attrCounter]) + "=" + str(dataTestInstance) + " | " + attrNameArray[-1] + "=" + str(classKey)
+                                if searchString in key:
+                                        #print("got data for " + searchString)
+                                        foundMatchingProb = True
+                                        foundProb = condProbDict[key]
+                                        break
+                        if foundMatchingProb == True:
+                                #print("Multiplying totalProb (" + str(totalProb) + ") by " + str(foundProb))
+                                totalProb = totalProb * foundProb
+                        else: 
+                                if smoothingBool == False:
+                                        #print("Multiplying totalProb (" + str(totalProb) + ") by 0")
+                                        totalProb = totalProb * 0
+                                else:
+                                        smoothedProb = 1.0 / totalInstances
+                                        #print("Multiplying totalProb (" + str(totalProb) + ") by " + str(smoothedProb))
+                                        totalProb = totalProb * smoothedProb
+                        attrCounter = attrCounter + 1
+                classProbList.append(totalProb)
+        testProbList.append(classProbList)
+#print(testProbList)
 
 # testing output
 demoTestFile = 'NB_test_smoothing.txt'
 outputTestFile = 'privateTestsOutput.txt'
-# f=open(outputTestFile,"w")
-# f.write("tuff")
-# f.close()
+testFileOut=open(outputTestFile,"w")
+for testedInstances in testProbList: # row in test file
+        bestProb = testedInstances[0]
+        savedBestIndex = 0
+        index = 0
+        for classProb in testedInstances:
+                if classProb > bestProb:
+                        bestProb = classProb
+                        savedBestIndex = index
+                index = index + 1
+        bestClassName = ""
+        classIndexGetter = 0
+        for classKey in instanceLikelihood:
+                if classIndexGetter == savedBestIndex:
+                        bestClassName = classKey
+                        break
+                classIndexGetter = classIndexGetter + 1
+        #print(bestClassName)
+        testFileOut.write(bestClassName + "\n")
+testFileOut.close()
 
 # NOTES
 # for smoothing: use function on slides (w/ Additoinal Issues--zero counts)
