@@ -9,13 +9,13 @@ def sigmoid_derivative(x):
 #i can make the weights and biases random??
 count=0
 network_ls=[]
-with open('texting.txt') as file_obj:
+with open('texting.txt') as file_obj: #THIS FILE FOR TESTING THE ACTUAL INSTANCES
     for line in file_obj:
         inner_list = [elt.strip() for elt in line.split(',')]
         network_ls.append(inner_list)
     count+=len(inner_list)
 layers=[]
-with open('layers.txt') as file_obj:
+with open('layers.txt') as file_obj: #THIS IS FOR THE NUMBER OF NEURONS (HIDDEN LAYERS)
     for line in file_obj:
         inner_list = [elt.strip() for elt in line.split(',')]
         layers.append(inner_list)
@@ -34,11 +34,38 @@ for j in range(num_layers):
 new_weights=[0]*num_layers
 for j in range(num_layers): #2
     new_weights[j]=random.random()
-
 #new bias
 new_bias=random.random()
 #for the end
 final_classification=[0]*len(network_ls)
+
+
+# NORMALIZE DATA
+means=[0]*(len(network_ls[0])-1)
+stdev=[0]*(len(network_ls[0])-1)
+for j in range(len(network_ls[0])-1):
+    for i in range(len(network_ls)):
+        if (network_ls[i][j] != 'yes' and network_ls[i][j] != 'no'):
+            means[j]+=float(network_ls[i][j])
+    means[j]=float(means[j])/float(len(network_ls))
+
+for j in range(len(network_ls[0])-1):
+    temp=0
+    for i in range(len(network_ls)):
+        if (network_ls[i][j] != 'yes' and network_ls[i][j] != 'no'):
+            temp+=(float(network_ls[i][j])-float(means[j]))**2
+
+    stdev[j]=float(temp)/float(len(network_ls)-1)
+
+for i in range(len(network_ls)):
+    for j in range(len(network_ls[0])-1):
+        if (network_ls[i][j] != 'yes' and network_ls[i][j] != 'no'):
+            network_ls[i][j]=(float(network_ls[i][j])-float(means[i]))/float(stdev[i]+1e-15)
+print("Network")
+print(network_ls)
+
+
+
 # START LOOP HERE, DEFINE ALL WEIGHTS AND BIASES BEFORE HERE
 count=0
 
@@ -50,19 +77,19 @@ while (count<10):
         for j in range(len(network_ls)):
             for x in range(len(network_ls[0])-1):
                 if (network_ls[j][x] !='yes' and network_ls[j][x]!='no'):
-                    sum_array[n][j]+=weights[n][x]*float(network_ls[j][x])+bias[n]
+                    sum_array[n][j]+=(weights[n][x]*float(network_ls[j][x]))+bias[n]
     #HIDDEN LAYERS SIGMOID TIME
     for n in range(num_layers):
         for j in range(len(network_ls)):
             sum_array[n][j]=sigmoid(sum_array[n][j])
     #HIDDEN LAYERS COMPLETED
 
-
     #STARTING HIDDEN TO OUTPUT LAYER
     new_sum_hidden = [0] * len(network_ls)
     for i in range(len(network_ls)): #7
         for j in range(num_layers): #2
-            new_sum_hidden[i]+=new_weights[j]*sum_array[j][i] + new_bias
+            new_sum_hidden[i]+=(new_weights[j]*sum_array[j][i]) + new_bias
+
     for i in range(len(new_sum_hidden)):
         new_sum_hidden[i]=sigmoid(new_sum_hidden[i])
 
@@ -117,18 +144,18 @@ while (count<10):
     ## bias=bias-bias_update*LR. weight=weight-weight_update*LR
 
     for i in range(len(bias)):
-        bias[i]=(bias[i]-bias_update[i])*learning_rate
-    new_bias=(new_bias-new_bias_update)*learning_rate
-    print(new_bias)
+        bias[i]=bias[i]-bias_update[i]*learning_rate
+    new_bias=new_bias-new_bias_update*learning_rate
+    print("New Bias: "+str(new_bias)+"\n")
     for j in range(num_layers):
         for i in range(len(network_ls[0]) - 1):  # 15
-            weights[j][i] =(weights[j][i] -weight_update[j][i])*learning_rate
-    print(new_weights)
+            weights[j][i] =weights[j][i] -weight_update[j][i]*learning_rate
+    print("New Weights: "+str(new_weights)+"\n")
     for i in range(len(new_weights)):
-        new_weights[i]=(new_weights[i]-new_weight_update[i])*learning_rate
+        new_weights[i]=new_weights[i]-new_weight_update[i]*learning_rate
             #new_weights[j][i] = (new_weights[j][i] -  new_weight_update[j][i]) * learning_rate
-    #print(bias)
-    #print(weights)
+    print("Bias: "+str(bias)+"\n")
+    print("Weights: "+str(weights)+"\n")
     print(new_sum_hidden)
 
     for i in range(len(new_sum_hidden)):
