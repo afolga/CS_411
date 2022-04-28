@@ -38,8 +38,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-trainingFileString = 'trainFile.txt' #--change during demo
-testingFileString = 'testFile.txt' #--change during demo
+trainingFileString = '1-linear-regression-training.txt' #--change during demo
+testingFileString = '1-linear-regression-testData.txt' #--change during demo
 
 # // getting data from training file as list of list
 def parseData(fileName):
@@ -123,7 +123,7 @@ while(True):
 for dataPoint in parsedData:
         plt.scatter(dataPoint[0], dataPoint[1], color='blue')
 # plotting linear function
-x = np.linspace(0,100,100)
+x = np.linspace(0,3,100)
 y = theta0 + theta1*x
 plt.plot(x, y, '-r')
 
@@ -139,38 +139,11 @@ for i in range(len(parsedTestData)):
 # plotting test data
 for dataPoint in parsedTestData:
         plt.scatter(dataPoint[0], dataPoint[1], color='black')
-plt.xlim([0, 20])
-plt.ylim([0, 20])
+# plt.xlim([0, 20])
+# plt.ylim([0, 20])
 trainingLegend = mpatches.Patch(color='blue', label='Training data')
 testingLegend = mpatches.Patch(color='black', label='Testing data')
 lineLegend = mpatches.Patch(color='red', label='Linear Function')
 plt.legend(handles=[trainingLegend, testingLegend, lineLegend])
 #plt.legend()
 plt.show()
-
-'''
-Loss function, update theta0 and 1 -> updating loss function
-if less than 0.001 then stop
-(should be gradually lower, if it's greater than change code or parameters)
-parameters meaning alpha in equation
-'''
-
-'''
-Don't touch functions for test data
-just predict the y
-then plot it
-'''
-
-# ignore header(line 1) for test data
-
-'''
-For demo, do #2 (ploting), not #1 (writing predicts to text)
-        plot:
-                training data points
-                predicted data points
-                linear function
-'''
-
-'''
-Using current training, slope (newLoss?) should be 2
-'''
