@@ -37,12 +37,12 @@ for j in range(num_layers): #2
 
 #new bias
 new_bias=random.random()
-
+#for the end
+final_classification=[0]*len(network_ls)
 # START LOOP HERE, DEFINE ALL WEIGHTS AND BIASES BEFORE HERE
 count=0
 
 while (count<10):
-
 
     # Input to hidden layer
     sum_array=[[0 for i in range(len(network_ls))] for j in range(num_layers)]
@@ -103,19 +103,47 @@ while (count<10):
         var=0
     bias_update=[1]*num_layers
     a=0
-    for  c in range(num_layers):
+    for c in range(num_layers):
         for p in range(len(network_ls)):
             a+=((float(new_sum_hidden[p])-float(class_label[p]))*float(sum_array[c][p]))*(1-float(sum_array[c][p]))*float(new_weights[c])
-            print(a)
+            #print(a)
 
         bias_update[c]=a
 
     ## bias_update, weight_update, new_bias_update, new_weight_update
-
+    ##minibatch - linear logistic regression, random m on n mini batch
     ## LR=5e-3
+    learning_rate=5e-3
     ## bias=bias-bias_update*LR. weight=weight-weight_update*LR
 
+    for i in range(len(bias)):
+        bias[i]=(bias[i]-bias_update[i])*learning_rate
+    new_bias=(new_bias-new_bias_update)*learning_rate
+    print(new_bias)
+    for j in range(num_layers):
+        for i in range(len(network_ls[0]) - 1):  # 15
+            weights[j][i] =(weights[j][i] -weight_update[j][i])*learning_rate
+    print(new_weights)
+    for i in range(len(new_weights)):
+        new_weights[i]=(new_weights[i]-new_weight_update[i])*learning_rate
+            #new_weights[j][i] = (new_weights[j][i] -  new_weight_update[j][i]) * learning_rate
+    #print(bias)
+    #print(weights)
+    print(new_sum_hidden)
+
+    for i in range(len(new_sum_hidden)):
+        if new_sum_hidden[i]>0.5:
+            final_classification[i]='yes'
+        else:
+            final_classification[i]='no'
     # For each value new_sum_hidden (1x7), if >0.5, assign to 1/yes. Count number of misclassified, store in num_misclassified. If # misclassified==num_misclassified,
     # break, else num_misclassified=# misclassified (until the 2 match) ??
 
     count=count+1
+
+
+#MAKING OUTPUT FILE
+f=open("final_class.txt",'w')
+for i in range(len(final_classification)):
+    f.write(final_classification[i])
+    f.write('\n')

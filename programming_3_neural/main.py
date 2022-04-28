@@ -4,6 +4,8 @@ import random
 
 def sigmoid(x):
     return (1 / (1 + np.exp(-x)))
+def sigmoid_derivative(x):
+    return x * (1 - x)
 #i can make the weights and biases random??
 count=0
 network_ls=[]
@@ -69,6 +71,9 @@ for i in network_ls:
     count_sum+=1
     #print(count_sum)
     count_weight+=1
+my_ls=[12,'12','ac']
+for i in my_ls:
+    print(type(i))
 #rint(network_ls)
 rows,cols=(len(network_ls[0])-1),len(network_ls)
 sums=[[0]*cols]*rows
